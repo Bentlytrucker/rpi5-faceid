@@ -1,4 +1,4 @@
-# Raspberry Pi 5 Face Recognition System
+# Raspberry Pi 5 Face Recognition
 
 Real-time face recognition system optimized for Raspberry Pi 5 with Camera Module 3 using TensorFlow Lite Runtime.
 
@@ -25,23 +25,10 @@ Real-time face recognition system optimized for Raspberry Pi 5 with Camera Modul
 - Python 3.7+
 - Virtual environment (recommended)
 
-## Quick Start
+## Installation
 
-### 1. Clone Repository
 ```bash
-git clone <repository-url>
-cd raspberry_pi_face_recognition
-```
-
-### 2. Install Dependencies
-```bash
-chmod +x install.sh
-./install.sh
-```
-
-### 3. Run Face Recognition
-```bash
-python3 realtime_inference.py
+pip install -r requirements.txt
 ```
 
 ## Installation Guide
@@ -74,13 +61,7 @@ sudo raspi-config
 # Interface Options → Camera → Enable
 ```
 
-#### 5. Configure GPU Memory
-```bash
-sudo raspi-config
-# Performance Options → GPU Memory → 128
-```
-
-#### 6. Reboot System
+#### 5. Reboot System
 ```bash
 sudo reboot
 ```
@@ -104,27 +85,6 @@ sudo reboot
 - CPU usage percentage
 - RAM usage percentage
 - Number of registered faces
-
-## Project Structure
-
-```
-raspberry_pi_face_recognition/
-├── README.md
-├── install.sh
-├── requirements.txt
-├── realtime_inference.py
-├── convert_model.py
-├── models/
-│   ├── Lightweight-Face-Detection.tflite
-│   └── MobileFaceNet_9925_9680.tflite
-├── docs/
-│   ├── INSTALLATION.md
-│   ├── TROUBLESHOOTING.md
-│   └── PERFORMANCE.md
-└── tests/
-    ├── test_camera.py
-    └── test_models.py
-```
 
 ## Model Information
 
@@ -192,11 +152,7 @@ The MobileFaceNet model was converted from TensorFlow protobuf (.pb) format to T
    print("✓ Model converted successfully")
    ```
 
-#### Conversion Benefits:
-- **Reduced model size**: ~50% smaller than .pb format
-- **Faster inference**: Optimized for ARM processors
-- **Lower memory usage**: Better for Raspberry Pi 5
-- **Quantization support**: Further optimization possible
+
 
 ## Performance
 
@@ -208,67 +164,6 @@ The MobileFaceNet model was converted from TensorFlow protobuf (.pb) format to T
 - **Camera Resolution**: 640x480 (optimized for performance)
 - **Model Size**: ~5MB (converted from .pb format)
 
-### Optimization Tips
-1. Use virtual environment with `--system-site-packages`
-2. Install `tflite-runtime` instead of full TensorFlow
-3. Use `--no-deps` flag for pip installations
-4. Set GPU memory to 128MB in raspi-config
-
-## Troubleshooting
-
-### Common Issues
-
-#### Camera Not Detected
-```bash
-# Check camera status
-vcgencmd get_camera
-
-# Enable camera interface
-sudo raspi-config
-# Interface Options → Camera → Enable
-```
-
-#### Permission Errors
-```bash
-# Add user to video group
-sudo usermod -a -G video $USER
-```
-
-#### Memory Issues
-```bash
-# Increase swap memory
-sudo dphys-swapfile swapoff
-sudo nano /etc/dphys-swapfile
-# CONF_SWAPSIZE=100
-sudo dphys-swapfile setup
-sudo dphys-swapfile swapon
-```
-
-#### Model Loading Errors
-```bash
-# Check model files exist
-ls -la models/
-
-# Verify TFLite Runtime installation
-python3 -c "import tflite_runtime; print('TFLite Runtime OK')"
-```
-
-## Development
-
-### Adding New Models
-1. Place `.tflite` files in `models/` directory
-2. Update model paths in `realtime_inference.py`
-3. Test with `python3 tests/test_models.py`
-
-### Converting Models from .pb to .tflite
-If you have a TensorFlow protobuf (.pb) model that needs conversion:
-
-1. **Place the .pb file in the project root**
-2. **Run the conversion script**:
-   ```bash
-   python3 convert_model.py
-   ```
-3. **The converted .tflite file will be saved in `models/` directory**
 
 ### Customizing Parameters
 Edit constants in `realtime_inference.py`:
