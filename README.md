@@ -25,15 +25,10 @@ Real-time face recognition system optimized for Raspberry Pi 5 with Camera Modul
 - Python 3.7+
 - Virtual environment (recommended)
 
-## Installation
 
-```bash
-pip install -r requirements.txt
-```
 
-## Installation Guide
 
-### Manual Installation
+### Installation
 
 #### 1. System Dependencies
 ```bash
