@@ -276,17 +276,6 @@ Edit constants in `realtime_inference.py`:
 - `SIMILARITY_THRESHOLD`: Face recognition threshold (default: 0.6)
 - `FRAME_WIDTH/HEIGHT`: Camera resolution (default: 640x480)
 
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test thoroughly on Raspberry Pi 5
-5. Submit a pull request
 
 ## Model Sources
 
