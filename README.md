@@ -28,21 +28,21 @@ Real-time face recognition system optimized for Raspberry Pi 5 with Camera Modul
 
 
 
-### Installation
+## Installation
 
-#### 1. System Dependencies
+### 1. System Dependencies
 ```bash
 sudo apt update && sudo apt upgrade -y
 sudo apt install python3-picamera2 -y
 ```
 
-#### 2. Create Virtual Environment
+### 2. Create Virtual Environment
 ```bash
 python3 -m venv ~/venv --system-site-packages
 source ~/venv/bin/activate
 ```
 
-#### 3. Install Python Dependencies
+### 3. Install Python Dependencies
 ```bash
 pip install --no-deps tflite-runtime
 pip install --no-deps opencv-python
@@ -50,13 +50,13 @@ pip install numpy==1.24.2
 pip install psutil
 ```
 
-#### 4. Enable Camera Interface
+### 4. Enable Camera Interface
 ```bash
 sudo raspi-config
 # Interface Options → Camera → Enable
 ```
 
-#### 5. Reboot System
+### 5. Reboot System
 ```bash
 sudo reboot
 ```
