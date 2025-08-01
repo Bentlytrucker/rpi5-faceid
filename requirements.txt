@@ -1,0 +1,22 @@
+# Raspberry Pi 5 Face Recognition System Requirements
+# Optimized for Raspberry Pi with TFLite Runtime
+
+# Core ML Runtime (lightweight alternative to TensorFlow)
+tflite-runtime==2.14.0
+
+# Computer Vision
+opencv-python==4.8.1.78
+
+# Numerical Computing
+numpy==1.24.2
+
+# System Monitoring
+psutil==5.9.5
+
+# Camera Interface (system package)
+# python3-picamera2 (installed via apt)
+
+# Development Dependencies (optional)
+# pytest==7.4.0
+# black==23.7.0
+# flake8==6.0.0 
