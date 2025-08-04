@@ -14,7 +14,7 @@ import sys
 import subprocess
 
 # Add parent directory to path to import inference module
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'face'))
 from inference import FaceRecognitionInference
 
 class FaceRecognitionGUI:
