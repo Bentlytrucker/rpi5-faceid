@@ -1,4 +1,3 @@
-
 #!/usr/bin/env python3
 """
 Raspberry Pi Face Recognition GUI - External Camera Window
@@ -12,6 +11,7 @@ import threading
 import time
 import os
 import sys
+import subprocess
 
 # Add parent directory to path to import inference module
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -530,44 +530,109 @@ class FaceRecognitionGUI:
             # Success message
             success_label = tk.Label(
                 main_frame,
-                text="Login Successful",
+                text="Face Recognition Login Successful",
                 font=('Arial', 16),
                 bg='#2c3e50',
                 fg='white'
-            )
-            success_label.pack(pady=(0, 50))
+                        )
+            success_label.pack(pady=(0, 30))    
             
-            # System options frame
-            options_frame = tk.Frame(main_frame, bg='#34495e', relief=tk.RAISED, bd=2)
-            options_frame.pack(fill=tk.BOTH, expand=True, pady=20)
+            # File execution frame
+            file_frame = tk.Frame(main_frame, bg='#34495e', relief=tk.RAISED, bd=2)
+            file_frame.pack(fill=tk.BOTH, expand=True, pady=20)
             
-            options_title = tk.Label(
-                options_frame,
-                text="System Options",
+            file_title = tk.Label(
+                file_frame,
+                text="Hand Mini2 System",
                 font=('Arial', 16, 'bold'),
                 bg='#34495e',
                 fg='white'
             )
-            options_title.pack(pady=20)
+            file_title.pack(pady=20)
             
-            # Option buttons
-            tk.Button(
-                options_frame,
-                text="Continue to System",
-                command=self.continue_to_system,
+            # Fixed file path (hidden from GUI)
+            self.file_path_var = tk.StringVar(value="handMini2/inference_landmark_ocr.py")
+            
+            # Execute button
+            execute_button = tk.Button(
+                file_frame,
+                text="Run Hand Mini2",
+                command=self.execute_file,
                 font=('Arial', 14, 'bold'),
                 bg='#27ae60',
                 fg='white',
                 relief=tk.RAISED,
                 bd=3,
                 padx=30,
-                pady=15
-            ).pack(pady=20)
+                pady=10
+            )
+            execute_button.pack(pady=20)
+            
+            # Status label for file execution
+            self.file_status_label = tk.Label(
+                file_frame,
+                text="Ready to run Hand Mini2",
+                font=('Arial', 10),
+                bg='#34495e',
+                fg='#ecf0f1'
+            )
+            self.file_status_label.pack(pady=(0, 20))
             
             # Don't close camera window - keep it running
             
         except Exception as e:
             print(f"Transform to logged-in screen error: {e}")
+    
+
+    
+    def execute_file(self):
+        """Execute Hand Mini2 in background."""
+        file_path = self.file_path_var.get().strip()
+        
+        if not file_path:
+            messagebox.showwarning("Warning", "File path not set.")
+            return
+        
+        if not os.path.exists(file_path):
+            messagebox.showerror("Error", f"File not found: {file_path}")
+            return
+        
+        try:
+            # Update status
+            self.file_status_label.config(
+                text="Starting Hand Mini2...",
+                fg='#f39c12'
+            )
+            self.root.update()
+            
+            # Execute in background to avoid camera conflicts
+            if file_path.endswith('.py'):
+                # Execute Python file in background
+                process = subprocess.Popen(
+                    ['python3', file_path],
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE,
+                    text=True
+                )
+                
+                # Update status to show it's running
+                self.file_status_label.config(
+                    text="Hand Mini2 is running in background",
+                    fg='#27ae60'
+                )
+                
+                # Show success message
+                messagebox.showinfo("Success", "Hand Mini2 started successfully in background!")
+                
+            else:
+                messagebox.showerror("Error", "Only Python files are supported.")
+                
+        except Exception as e:
+            self.file_status_label.config(
+                text="Failed to start Hand Mini2",
+                fg='#e74c3c'
+            )
+            messagebox.showerror("Error", f"Failed to execute file: {str(e)}")
     
     def continue_to_system(self):
         """Continue to the main system."""
@@ -592,7 +657,7 @@ class FaceRecognitionGUI:
             # Update window title and size
             self.root.title("Face Recognition System")
             self.root.geometry("600x500")
-            
+
             # Center the window
             self.root.update_idletasks()
             width = self.root.winfo_width()
