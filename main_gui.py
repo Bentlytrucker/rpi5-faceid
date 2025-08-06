@@ -525,13 +525,9 @@ class IntegratedGUI:
         # ### 결정적인 수정 부분 ###
         # Tkinter의 winfo_screenwidth() 대신, 더 신뢰성 있는 pyautogui.size()를 사용합니다.
         # 이것이 실제 전체 화면 해상도를 가져옵니다.
-        try:
-            screen_width, screen_height = pyautogui.size()
-            # 실행 시 터미널에 감지된 해상도가 출력되니, 올바른지(예: 1920x1080) 확인해보세요.
-            print(f"✓ Screen size detected via pyautogui: {screen_width}x{screen_height}")
-        except Exception as e:
-            print(f"✗ Failed to get screen size via pyautogui: {e}. Defaulting to 1920x1080.")
-            screen_width, screen_height = 1920, 1080
+        
+        screen_width, screen_height = pyautogui.size()
+        
             
         self.tkinter_queue = queue.Queue()
         self.camera = SharedCamera()
@@ -562,21 +558,32 @@ class IntegratedGUI:
     def _start_screen_box_drawing(self):
         if self.overlay_window: return
         try:
-            # 1. 먼저 화면 전체를 캡처
-            self.original_screenshot = pyautogui.screenshot()
+            # 1. scrot 명령어를 시스템에서 직접 호출하여 전체 화면을 임시 파일로 저장합니다.
+            #    이것이 pyautogui의 불안정한 동작을 우회하는 가장 확실한 방법입니다.
+            screenshot_path = "/tmp/fullscreen_capture.png"
+            os.system(f"scrot -o {screenshot_path}") # -o 옵션은 덮어쓰기를 허용합니다.
+
+            # 2. 저장된 스크린샷 파일을 PIL 이미지 객체로 불러옵니다.
+            self.original_screenshot = Image.open(screenshot_path)
             
-            # 2. 일반적인 전체 화면 창 생성 (투명도 속성 없음)
+            # --- 이하 로직은 동일합니다 ---
+
+            # 3. 일반적인 전체 화면 창 생성
             self.overlay_window = tk.Toplevel(self.root)
             self.overlay_window.attributes('-topmost', True)
             self.overlay_window.attributes('-fullscreen', True)
             self.overlay_window.overrideredirect(True)
             
-            # 3. 캡처한 스크린샷을 캔버스 배경으로 표시
+            # 4. 불러온 스크린샷을 캔버스 배경으로 표시
             self.tk_screenshot = ImageTk.PhotoImage(self.original_screenshot)
             self.overlay_canvas = tk.Canvas(self.overlay_window, cursor="crosshair")
             self.overlay_canvas.pack(fill=tk.BOTH, expand=True)
             self.overlay_canvas.create_image(0, 0, image=self.tk_screenshot, anchor='nw')
-            print("✓ Screenshot-on-canvas overlay started.")
+            print("✓ Screenshot-on-canvas overlay started using scrot.")
+
+        except FileNotFoundError:
+             print(f"✗ CRITICAL ERROR: Screenshot file not found at {screenshot_path}.")
+             print("   Please ensure 'scrot' is installed ('sudo apt-get install scrot')")
         except Exception as e:
             print(f"✗ Error starting screen box drawing: {e}")
             if self.overlay_window: self.overlay_window.destroy(); self.overlay_window = None
