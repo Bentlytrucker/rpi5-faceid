@@ -518,24 +518,20 @@ class IntegratedGUI:
     def __init__(self):
         self.root = tk.Tk()
         self.root.title("Face & Hand Tracking System")
-        # geometry는 컨트롤 창의 크기일 뿐, 전체 화면 크기와는 무관합니다.
         self.root.geometry("800x600")
         self.root.configure(bg='#2c3e50')
-        
-        # ### 결정적인 수정 부분 ###
-        # Tkinter의 winfo_screenwidth() 대신, 더 신뢰성 있는 pyautogui.size()를 사용합니다.
-        # 이것이 실제 전체 화면 해상도를 가져옵니다.
-        
-        screen_width, screen_height = pyautogui.size()
-        
-            
+
+        # 1. 해상도를 1920x1080으로 고정하는 것은 그대로 유지합니다.
+        self.screen_width, self.screen_height = 1920, 1080
+        print(f"✓ Screen size manually set to: {self.screen_width}x{self.screen_height}")
+
         self.tkinter_queue = queue.Queue()
         self.camera = SharedCamera()
         self.face_manager = FaceRecognitionManager(self.camera)
-        
-        # 이전 단계에서 수정한 HandTrackingManager에 올바른 크기를 전달합니다.
-        self.hand_manager = HandTrackingManager(self.camera, self.tkinter_queue, screen_size=(screen_width, screen_height))
-        
+
+        # 이 screen_size는 HandTrackingManager의 좌표 계산에 사용됩니다.
+        self.hand_manager = HandTrackingManager(self.camera, self.tkinter_queue, screen_size=(self.screen_width, self.screen_height))
+
         self.overlay_window, self.overlay_canvas = None, None
         self.original_screenshot, self.tk_screenshot = None, None
         self.is_logged_in, self.current_user, self.is_running, self.current_mode = False, None, False, "idle"
@@ -558,32 +554,33 @@ class IntegratedGUI:
     def _start_screen_box_drawing(self):
         if self.overlay_window: return
         try:
-            # 1. scrot 명령어를 시스템에서 직접 호출하여 전체 화면을 임시 파일로 저장합니다.
-            #    이것이 pyautogui의 불안정한 동작을 우회하는 가장 확실한 방법입니다.
+            # scrot 명령어로 전체 화면 캡처 (이전 단계와 동일)
             screenshot_path = "/tmp/fullscreen_capture.png"
-            os.system(f"scrot -o {screenshot_path}") # -o 옵션은 덮어쓰기를 허용합니다.
-
-            # 2. 저장된 스크린샷 파일을 PIL 이미지 객체로 불러옵니다.
+            os.system(f"scrot -o {screenshot_path}")
             self.original_screenshot = Image.open(screenshot_path)
             
-            # --- 이하 로직은 동일합니다 ---
-
-            # 3. 일반적인 전체 화면 창 생성
+            # 새 Toplevel 창 생성
             self.overlay_window = tk.Toplevel(self.root)
-            self.overlay_window.attributes('-topmost', True)
-            self.overlay_window.attributes('-fullscreen', True)
+            
+            # ### 결정적인 수정 부분 ###
+            # 1. '-fullscreen' 속성 대신, geometry를 사용하여 직접 크기와 위치를 설정합니다.
+            #    f-string을 사용하여 "1920x1080+0+0" 과 같은 형식의 문자열을 만듭니다.
+            #    의미: "가로 1920, 세로 1080 크기로, 화면 좌상단(x=0, y=0)에 위치시켜라"
+            self.overlay_window.geometry(f"{self.screen_width}x{self.screen_height}+0+0")
+            
+            # 2. 창 테두리(제목 표시줄 등)를 없애기 위해 이 속성은 여전히 필요합니다.
             self.overlay_window.overrideredirect(True)
             
-            # 4. 불러온 스크린샷을 캔버스 배경으로 표시
+            # 3. 창을 다른 모든 창들보다 위에 있도록 설정합니다.
+            self.overlay_window.attributes('-topmost', True)
+            
+            # 캔버스에 캡처한 스크린샷을 배경으로 표시
             self.tk_screenshot = ImageTk.PhotoImage(self.original_screenshot)
             self.overlay_canvas = tk.Canvas(self.overlay_window, cursor="crosshair")
             self.overlay_canvas.pack(fill=tk.BOTH, expand=True)
             self.overlay_canvas.create_image(0, 0, image=self.tk_screenshot, anchor='nw')
-            print("✓ Screenshot-on-canvas overlay started using scrot.")
+            print("✓ Overlay started using explicit geometry.")
 
-        except FileNotFoundError:
-             print(f"✗ CRITICAL ERROR: Screenshot file not found at {screenshot_path}.")
-             print("   Please ensure 'scrot' is installed ('sudo apt-get install scrot')")
         except Exception as e:
             print(f"✗ Error starting screen box drawing: {e}")
             if self.overlay_window: self.overlay_window.destroy(); self.overlay_window = None
