@@ -50,16 +50,7 @@ pip install numpy==1.24.2
 pip install psutil
 ```
 
-### 4. Enable Camera Interface
-```bash
-sudo raspi-config
-# Interface Options → Camera → Enable
-```
 
-### 5. Reboot System
-```bash
-sudo reboot
-```
 
 ## Usage
 
