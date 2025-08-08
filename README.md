@@ -154,7 +154,7 @@ The MobileFaceNet model was converted from TensorFlow protobuf (.pb) format to T
 ### Customizing Parameters
 Edit constants in `realtime_inference.py`:
 - `CONFIDENCE_THRESHOLD`: Face detection confidence (default: 0.15)
-- `SIMILARITY_THRESHOLD`: Face recognition threshold (default: 0.6)
+- `SIMILARITY_THRESHOLD`: Face recognition threshold (default: 0.75)
 - `FRAME_WIDTH/HEIGHT`: Camera resolution (default: 640x480)
 
 
